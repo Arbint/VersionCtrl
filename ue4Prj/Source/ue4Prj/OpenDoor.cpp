@@ -2,6 +2,9 @@
 
 #include "OpenDoor.h"
 #include "GameFramework/Actor.h"
+#include "Engine/TriggerVolume.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
@@ -18,16 +21,19 @@ UOpenDoor::UOpenDoor()
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AActor* Owner = GetOwner();
-	if (Owner!= nullptr)
-	{
-		Owner->AddActorWorldRotation(FRotator(0.0f,90.f, 0.f));
-	}
 	// ...
 	
 }
 
+
+void UOpenDoor::OpenDoor()
+{
+	AActor* Owner = GetOwner();
+	if (Owner != nullptr)
+	{
+		Owner->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+	}
+}
 
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -35,5 +41,20 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	MonitorTrigger();
+}
+
+void UOpenDoor::MonitorTrigger()
+{
+	AActor* PlayerPawnActor = (AActor*)getPlayerPawn();
+	if (PressurePlate && PressurePlate->IsOverlappingActor(PlayerPawnActor))
+	{
+		OpenDoor();
+	}
+}
+
+APawn* UOpenDoor::getPlayerPawn()
+{
+	return GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
