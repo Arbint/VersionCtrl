@@ -4,47 +4,36 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "OpenDoor.generated.h"
-class ATriggerVolume;
+#include "Components/TimelineComponent.h"
+#include "lightBlinking.generated.h"
+
+
+class ALight;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UE4PRJ_API UOpenDoor : public UActorComponent
+class UE4PRJ_API UlightBlinking : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UOpenDoor();
+	UlightBlinking();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	void OpenDoor();
-	void CloseDoor();
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-private:
-	UPROPERTY(VisibleAnywhere)
-		float OpenAngle = 90.0f;
+	ALight* getOwnerAsLight();
 
+	//Use Timeline:
+	UTimelineComponent* LightIntensityTimeLine;
 	UPROPERTY(EditAnywhere)
-		ATriggerVolume* PressurePlate;
-
-	UPROPERTY(EditAnywhere)
-		AActor* ActorThatOpens;
-
+		UCurveFloat* LightIntensityCurveFloat;
+	FOnTimelineFloat LightIntensityBinder;
 	UFUNCTION()
-		void MonitorTrigger();
-		
-	UFUNCTION()
-		APawn* getPlayerPawn();
-
-	UPROPERTY(EditAnywhere)
-		float DoorCloseDelay = 1;
-	UPROPERTY()
-		float lastDoorOpenTime;
-	AActor* Onwer;
+		void LightIntensityBindFunc(float value);
 };
