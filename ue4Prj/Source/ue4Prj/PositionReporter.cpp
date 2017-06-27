@@ -21,9 +21,12 @@ void UPositionReporter::BeginPlay()
 
 	// ...
 	FString OwnerName = GetOwner()->GetName();
-	FString ObjectPos = "X = Something, Y = something, else, etc";
 	FVector OwnerLocation = GetOwner()->GetActorLocation();
-	UE_LOG(LogTemp, Warning, TEXT("%s is at X: %d, Y: %d, Z: %d"), *OwnerName,OwnerLocation.X, OwnerLocation.Y, OwnerLocation.Z);
+	FString XPosition = FString::SanitizeFloat(OwnerLocation.X);
+	FString YPosition = FString::SanitizeFloat(OwnerLocation.Y);
+	FString ZPosition = FString::SanitizeFloat(OwnerLocation.Z);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s is at X: %s, Y: %s, Z: %s"), *OwnerName, *XPosition, *YPosition, *ZPosition);
 }
 
 
