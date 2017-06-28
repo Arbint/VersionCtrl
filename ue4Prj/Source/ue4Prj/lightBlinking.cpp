@@ -53,11 +53,9 @@ ALight* UlightBlinking::getOwnerAsLight()
 void UlightBlinking::LightIntensityBindFunc(float value)
 {
 	ALight* OwnerLight = getOwnerAsLight();
-	UE_LOG(LogTemp, Warning, TEXT("Your message %d"), value);
-	if (OwnerLight)
+	if(OwnerLight)
 	{
 		OwnerLight->GetLightComponent()->SetIntensity(value);
-		OwnerLight->AddActorLocalOffset(FVector(value, value, value));
 	}
 }
 

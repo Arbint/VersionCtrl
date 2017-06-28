@@ -34,6 +34,6 @@ void AblinkingLight::Tick(float DeltaTime)
 
 void AblinkingLight::LightIntensityUpdate(float value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Your message %d"), value);
+	
 }
 
