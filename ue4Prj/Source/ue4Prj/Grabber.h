@@ -35,11 +35,12 @@ private:
 	APawn* GetPawnOnwer() const;
 	void GetPawnViewPoint(FVector& OutLocation, FRotator& OutRotation) const;
 	void PrintPawnViewPoint();
-	void GetFirstPickableInReach(FHitResult& hit) const;
+	bool GetFirstPickableInReach(FHitResult& hit) const;
 	void setupInputComponent();
 	void Grab();
 	void GrabRelease();
 	void GatherOwnerInfo();
+	void UpdateGrabedObject();
 	UPhysicsHandleComponent* pawnPhysicsHandleComp = nullptr;
 	UInputComponent* pawnInputComp = nullptr;
 //template class for getting different component from owner

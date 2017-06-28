@@ -5,6 +5,7 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/PlayerController.h"
+#include "Components/PrimitiveComponent.h"
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -31,6 +32,7 @@ void UGrabber::BeginPlay()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	UpdateGrabedObject();
 	// ...
 }
 
@@ -64,7 +66,7 @@ void UGrabber::PrintPawnViewPoint()
 	UE_LOG(LogTemp, Warning, TEXT("Rotation: %s"), *PawnRotation)
 }
 
-void UGrabber::GetFirstPickableInReach(FHitResult& hit) const
+bool UGrabber::GetFirstPickableInReach(FHitResult& hit) const
 {
 	FVector PlayerLocaiton{};
 	FRotator PlayerRotator{};
@@ -94,6 +96,7 @@ void UGrabber::GetFirstPickableInReach(FHitResult& hit) const
 		FString HitActorName = hit.GetActor()->GetName();
 		UE_LOG(LogTemp, Warning, TEXT("The actors name is: %s"), *HitActorName)
 	}
+	return bTracedSomething;
 }
 
 void UGrabber::setupInputComponent()
@@ -107,12 +110,21 @@ void UGrabber::Grab()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Grabing"));
 	FHitResult hit;
-	GetFirstPickableInReach(hit);
+	if (GetFirstPickableInReach(hit))
+	{
+		UPrimitiveComponent* hitedComponent = hit.GetComponent();
+		pawnPhysicsHandleComp->GrabComponent(hitedComponent,
+			NAME_None,
+			hitedComponent->GetOwner()->GetActorLocation(),
+			true
+		);
+	}
 }
 
 void UGrabber::GrabRelease()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Grab Released"));
+	pawnPhysicsHandleComp->ReleaseComponent();
 }
 
 void UGrabber::GatherOwnerInfo()
@@ -120,5 +132,17 @@ void UGrabber::GatherOwnerInfo()
 	pawnPhysicsHandleComp = GetOwnerComp<UPhysicsHandleComponent>();
 	pawnInputComp = GetOwnerComp<UInputComponent>();
 
+}
+
+void UGrabber::UpdateGrabedObject()
+{
+	if (pawnPhysicsHandleComp->GrabbedComponent)
+	{
+		FVector PawnLocaiton;
+		FRotator PawnRotation;
+		GetPawnViewPoint(PawnLocaiton, PawnRotation);
+		FVector TraceEnd = PawnLocaiton + PawnRotation.Vector() * TracingReach;
+		pawnPhysicsHandleComp->SetTargetLocation(TraceEnd);
+	}
 }
 
