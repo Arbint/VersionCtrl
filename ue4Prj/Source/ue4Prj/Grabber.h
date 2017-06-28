@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameFramework/Pawn.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Components/InputComponent.h"
 #include "Grabber.generated.h"
 class AC_DefaultPawn;
 
@@ -16,6 +18,10 @@ class UE4PRJ_API UGrabber : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UGrabber();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Functionality")
+	bool bDrawTracingDebugLine = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Functionality")
+	float TracingReach = 50.0f;
 
 protected:
 	// Called when the game starts
@@ -26,16 +32,34 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	APawn* GetPawnOnwer();
-
-private:
-	void GetPawnViewPoint(FVector& OutLocation, FRotator& OutRotation);
+	APawn* GetPawnOnwer() const;
+	void GetPawnViewPoint(FVector& OutLocation, FRotator& OutRotation) const;
 	void PrintPawnViewPoint();
-	void lineTraceForward();
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Functionality")
-	bool bDrawTracingDebugLine = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Functionality")
-	float TracingReach = 50.0f;
-
+	void GetFirstPickableInReach(FHitResult& hit) const;
+	void setupInputComponent();
+	void Grab();
+	void GrabRelease();
+	void GatherOwnerInfo();
+	UPhysicsHandleComponent* pawnPhysicsHandleComp = nullptr;
+	UInputComponent* pawnInputComp = nullptr;
+//template class for getting different component from owner
+private:
+	template<typename T>
+	T* UGrabber::GetOwnerComp()
+	{
+		AActor* Owner = GetOwner();
+		if (Owner)
+		{
+			T* component = Owner->FindComponentByClass<T>();
+			if (component)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Component Found!!"));
+				return component;
+			}
+		}
+		UE_LOG(LogTemp, Error, TEXT("%s don't have the Component..."), *Owner->GetName());
+		return nullptr;
+	}
 };
+
+

@@ -8,4 +8,5 @@
 AC_DefaultPawn::AC_DefaultPawn()
 {
 	GrabberComponent = CreateDefaultSubobject<UGrabber>("GrabberComponent");
+	PhysicsHadleComp = CreateDefaultSubobject<UPhysicsHandleComponent>("PhysicsHadleComp");
 }

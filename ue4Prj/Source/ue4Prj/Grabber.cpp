@@ -21,9 +21,9 @@ UGrabber::UGrabber()
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
-
 	// ...
-	UE_LOG(LogTemp, Warning, TEXT("Grabber Report For Duty"));
+	GatherOwnerInfo();
+	setupInputComponent();
 }
 
 
@@ -31,16 +31,15 @@ void UGrabber::BeginPlay()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	lineTraceForward();
 	// ...
 }
 
-APawn* UGrabber::GetPawnOnwer()
+APawn* UGrabber::GetPawnOnwer() const
 {
 	return (APawn*)GetOwner();
 }
 
-void UGrabber::GetPawnViewPoint(FVector& OutLocation, FRotator& OutRotation)
+void UGrabber::GetPawnViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
 	APawn* OnwningPawn = GetPawnOnwer();
 	
@@ -65,17 +64,16 @@ void UGrabber::PrintPawnViewPoint()
 	UE_LOG(LogTemp, Warning, TEXT("Rotation: %s"), *PawnRotation)
 }
 
-void UGrabber::lineTraceForward()
+void UGrabber::GetFirstPickableInReach(FHitResult& hit) const
 {
 	FVector PlayerLocaiton{};
 	FRotator PlayerRotator{};
 	GetPawnViewPoint(PlayerLocaiton, PlayerRotator);
 	FVector playerForwardDirection = PlayerRotator.Vector();
-	FHitResult Hit;
 	FCollisionQueryParams QueryParams( "PickUpTracing", false, GetOwner() );
 
 	bool bTracedSomething = GetWorld()->LineTraceSingleByChannel(
-		Hit,
+		hit,
 		PlayerLocaiton,
 		PlayerLocaiton + playerForwardDirection * TracingReach,
 		ECC_PlayerTracing,
@@ -93,7 +91,34 @@ void UGrabber::lineTraceForward()
 	}
 	if (bTracedSomething)
 	{
-		FString HitActorName = Hit.GetActor()->GetName();
+		FString HitActorName = hit.GetActor()->GetName();
 		UE_LOG(LogTemp, Warning, TEXT("The actors name is: %s"), *HitActorName)
 	}
 }
+
+void UGrabber::setupInputComponent()
+{
+	//bind action
+	pawnInputComp->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	pawnInputComp->BindAction("Grab", IE_Released, this, &UGrabber::GrabRelease);
+}
+
+void UGrabber::Grab()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Grabing"));
+	FHitResult hit;
+	GetFirstPickableInReach(hit);
+}
+
+void UGrabber::GrabRelease()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Grab Released"));
+}
+
+void UGrabber::GatherOwnerInfo()
+{
+	pawnPhysicsHandleComp = GetOwnerComp<UPhysicsHandleComponent>();
+	pawnInputComp = GetOwnerComp<UInputComponent>();
+
+}
+

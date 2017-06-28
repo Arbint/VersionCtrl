@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/DefaultPawn.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "C_DefaultPawn.generated.h"
 
 class UGrabber;
@@ -18,6 +19,6 @@ public:
 	AC_DefaultPawn();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuctionlaity")
 	UGrabber* GrabberComponent;
-	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fucntionlaity")
+	UPhysicsHandleComponent* PhysicsHadleComp;
 };
