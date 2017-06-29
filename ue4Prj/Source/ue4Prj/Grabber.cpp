@@ -55,17 +55,6 @@ void UGrabber::GetPawnViewPoint(FVector& OutLocation, FRotator& OutRotation) con
 	}
 }
 
-void UGrabber::PrintPawnViewPoint()
-{
-	FVector Location{};
-	FRotator Rotator{};
-	GetPawnViewPoint(Location, Rotator);
-	FString PawnLocation = Location.ToString();
-	FString PawnRotation = Rotator.ToString();
-	UE_LOG(LogTemp, Warning, TEXT("Location: %s"), *PawnLocation)
-	UE_LOG(LogTemp, Warning, TEXT("Rotation: %s"), *PawnRotation)
-}
-
 bool UGrabber::GetFirstPickableInReach(FHitResult& hit) const
 {
 	FVector PlayerLocaiton{};
@@ -91,11 +80,6 @@ bool UGrabber::GetFirstPickableInReach(FHitResult& hit) const
 			-1.f,
 			0, 5.0f);
 	}
-	if (bTracedSomething)
-	{
-		FString HitActorName = hit.GetActor()->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("The actors name is: %s"), *HitActorName)
-	}
 	return bTracedSomething;
 }
 
@@ -108,7 +92,6 @@ void UGrabber::setupInputComponent()
 
 void UGrabber::Grab()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Grabing"));
 	FHitResult hit;
 	if (GetFirstPickableInReach(hit))
 	{
@@ -123,7 +106,6 @@ void UGrabber::Grab()
 
 void UGrabber::GrabRelease()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Grab Released"));
 	pawnPhysicsHandleComp->ReleaseComponent();
 }
 

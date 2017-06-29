@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/DefaultPawn.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Camera/CameraComponent.h"
 #include "C_DefaultPawn.generated.h"
 
 class UGrabber;
@@ -17,8 +18,11 @@ class UE4PRJ_API AC_DefaultPawn : public ADefaultPawn
 	GENERATED_BODY()
 public:
 	AC_DefaultPawn();
+	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuctionlaity")
 	UGrabber* GrabberComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fucntionlaity")
 	UPhysicsHandleComponent* PhysicsHadleComp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Viewing")
+	UCameraComponent* playerEye;
 };

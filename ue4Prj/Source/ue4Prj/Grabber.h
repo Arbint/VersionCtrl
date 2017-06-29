@@ -34,7 +34,6 @@ public:
 private:
 	APawn* GetPawnOnwer() const;
 	void GetPawnViewPoint(FVector& OutLocation, FRotator& OutRotation) const;
-	void PrintPawnViewPoint();
 	bool GetFirstPickableInReach(FHitResult& hit) const;
 	void setupInputComponent();
 	void Grab();
@@ -54,11 +53,9 @@ private:
 			T* component = Owner->FindComponentByClass<T>();
 			if (component)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Component Found!!"));
 				return component;
 			}
 		}
-		UE_LOG(LogTemp, Error, TEXT("%s don't have the Component..."), *Owner->GetName());
 		return nullptr;
 	}
 };

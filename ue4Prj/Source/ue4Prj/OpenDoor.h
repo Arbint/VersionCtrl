@@ -7,6 +7,8 @@
 #include "OpenDoor.generated.h"
 class ATriggerVolume;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoorRequest);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UE4PRJ_API UOpenDoor : public UActorComponent
 {
@@ -25,7 +27,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Functionality")
+		float OpeningWeight = 50.0f;
+	UPROPERTY(BlueprintAssignable)
+		FDoorRequest OnDoorOpenRequest;
+	UPROPERTY(BlueprintAssignable)
+		FDoorRequest OnDoorCloseRequest;
 private:
 	UPROPERTY(VisibleAnywhere)
 		float OpenAngle = 90.0f;
@@ -33,18 +40,16 @@ private:
 	UPROPERTY(EditAnywhere)
 		ATriggerVolume* PressurePlate;
 
-	UPROPERTY(EditAnywhere)
-		AActor* ActorThatOpens;
-
 	UFUNCTION()
 		void MonitorTrigger();
 		
-	UFUNCTION()
-		APawn* getPlayerPawn();
 
 	UPROPERTY(EditAnywhere)
 		float DoorCloseDelay = 1;
 	UPROPERTY()
 		float lastDoorOpenTime;
 	AActor* Onwer;
+	
+private:
+	float getWeightInPlate();
 };

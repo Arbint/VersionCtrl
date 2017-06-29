@@ -5,6 +5,7 @@
 #include "Engine/TriggerVolume.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "Components/PrimitiveComponent.h"
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
@@ -16,7 +17,6 @@ UOpenDoor::UOpenDoor()
 	// ...
 }
 
-
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
@@ -24,9 +24,6 @@ void UOpenDoor::BeginPlay()
 	// ...
 	Onwer = GetOwner();
 }
-
-
-
 
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -39,8 +36,8 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 void UOpenDoor::MonitorTrigger()
 {
-	AActor* PlayerPawnActor = (AActor*)getPlayerPawn();
-	if (PressurePlate && PressurePlate->IsOverlappingActor(PlayerPawnActor))
+	
+	if (getWeightInPlate() >= OpeningWeight)
 	{
 		OpenDoor();
 		lastDoorOpenTime = GetWorld()->GetTimeSeconds();
@@ -54,16 +51,33 @@ void UOpenDoor::MonitorTrigger()
 
 void UOpenDoor::OpenDoor()
 {
-	Onwer->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+	//Onwer->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+	OnDoorOpenRequest.Broadcast();
 }
 
 void UOpenDoor::CloseDoor()
 {
-	Onwer->SetActorRotation(FRotator(0.0f, -90.0f, 0.0f));
+	//Onwer->SetActorRotation(FRotator(0.0f, -90.0f, 0.0f));
+	OnDoorCloseRequest.Broadcast();
 }
 
-APawn* UOpenDoor::getPlayerPawn()
+float UOpenDoor::getWeightInPlate()
 {
-	return GetWorld()->GetFirstPlayerController()->GetPawn();
+	float weight = 0.0f;
+	TArray<AActor*> ActorsInPlate;
+	PressurePlate->GetOverlappingActors(ActorsInPlate);
+	for (auto& item : ActorsInPlate)
+	{
+		TArray<UPrimitiveComponent*> PrimatrivesInActor; 
+		item->GetComponents<UPrimitiveComponent>(PrimatrivesInActor);
+		for (auto& primitiveComp : PrimatrivesInActor)
+		{
+			if (primitiveComp->IsSimulatingPhysics())
+			{
+				weight += primitiveComp->GetMass();
+			}
+		}
+	}
+	return weight;
 }
 
